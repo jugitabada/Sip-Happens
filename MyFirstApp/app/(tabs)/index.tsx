@@ -1,58 +1,59 @@
-import { Image } from 'expo-image';
 import { useState } from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-// I updated index.tsx to add counter and dynamic messages. June 05, 2026
+// Cafe Menu App - Group Task. June 22, 2026
+
+const menuItems = [
+  { id: '1', name: 'Americano', category: 'Hot Drinks' },
+  { id: '2', name: 'Latte', category: 'Hot Drinks' },
+  { id: '3', name: 'Cheesecake', category: 'Desserts' },
+  { id: '4', name: 'Brownie', category: 'Desserts' },
+  { id: '5', name: 'Sea Salt Latte', category: 'Cold Drinks' },
+  { id: '6', name: 'Matcha Latte', category: 'Cold Drinks' },
+  { id: '7', name: 'Spanish Latte', category: 'Cold Drinks' },
+];
 
 export default function App() {
-  const [name, setName] = useState('');
-  const [count, setCount] = useState(0);
+  const [selected, setSelected] = useState('');
+
+  const renderItem = ({ item }: { item: { id: string; name: string; category: string } }) => (
+    <View style={s.item}>
+      <Text style={s.category}>{item.category}</Text>
+      <Text style={s.name}>{item.name}</Text>
+      <TouchableOpacity style={s.btn} onPress={() => setSelected(item.name)}>
+        <Text style={s.btnText}>View Item</Text>
+      </TouchableOpacity>
+      <View style={s.divider} />
+    </View>
+  );
 
   return (
-    <View style={s.screen}>
-      <Image
-        source={{ uri: 'https://i.imgur.com/5kB7zLM.jpeg' }}
-        style={s.photo}
+    <SafeAreaView style={s.screen}>
+      <Text style={s.title}>Sip Happens Menu</Text>
+      <FlatList
+        data={menuItems}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
       />
-
-      <TextInput
-        placeholder="Type your name..."
-        onChangeText={setName}
-        style={s.input}
-      />
-
-      {name ? <Text style={s.greeting}>Hello, {name}!</Text> : null}
-
-      <Text style={s.counter}>Count: {count}</Text>
-
-      {count > 10 && <Text style={s.message}>Wow, that's a lot!</Text>}
-      {count < 0 && <Text style={s.message}>Going negative!</Text>}
-      {count === 0 && <Text style={s.message}>Counter is at zero!</Text>}
-
-      <View style={s.buttons}>
-        <TouchableOpacity style={s.btn} onPress={() => setCount(count + 1)}>
-          <Text style={s.btnText}>+</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={s.btn} onPress={() => setCount(count - 1)}>
-          <Text style={s.btnText}>-</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={s.btnReset} onPress={() => setCount(0)}>
-          <Text style={s.btnText}>Reset</Text>
-        </TouchableOpacity>
+      <View style={s.outputBox}>
+        <Text style={s.output}>
+          {selected ? `— ${selected}` : '— tap a button to see output'}
+        </Text>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const s = StyleSheet.create({
-  screen:   { flex:1, alignItems:'center', justifyContent:'center' },
-  photo:    { width:120, height:120, borderRadius:60 },
-  input:    { height:40, borderWidth:1, borderColor:'#ccc', borderRadius:8, marginTop:20, padding:10, width:200 },
-  greeting: { fontSize:18, fontWeight:'bold', marginTop:12 },
-  counter:  { fontSize:32, fontWeight:'bold', marginTop:20 },
-  message:  { fontSize:14, color:'#888', marginTop:8 },
-  buttons:  { flexDirection:'row', gap:10, marginTop:16 },
-  btn:      { backgroundColor:'#007AFF', padding:12, borderRadius:8, width:60, alignItems:'center' },
-  btnReset: { backgroundColor:'#FF3B30', padding:12, borderRadius:8, width:80, alignItems:'center' },
-  btnText:  { color:'#fff', fontWeight:'bold', fontSize:16 }
+  screen:    { flex:1, backgroundColor:'#1a1a1a', padding:20, paddingTop:40 },
+  title:     { fontSize:24, fontWeight:'bold', color:'#fff', marginBottom:16 },
+  item:      { marginBottom:8 },
+  category:  { fontSize:12, color:'#888' },
+  name:      { fontSize:18, fontWeight:'bold', color:'#fff', marginBottom:6 },
+  btn:       { borderWidth:1, borderColor:'#555', borderRadius:6, padding:6, alignSelf:'flex-start' },
+  btnText:   { fontSize:14, color:'#fff' },
+  divider:   { borderBottomWidth:1, borderBottomColor:'#333', marginTop:10, marginBottom:4 },
+  outputBox: { padding:12, backgroundColor:'#111', marginTop:8, borderRadius:8 },
+  output:    { fontSize:13, color:'#aaa' }
 });
