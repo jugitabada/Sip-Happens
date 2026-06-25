@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
-// Sip Happens Cafe - Profile. June 22, 2026
+// Sip Happens Cafe - Profile. June 25, 2026
 
 export default function ProfileScreen() {
   const [name, setName] = useState('');
@@ -33,31 +33,38 @@ export default function ProfileScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.avatar}>👤</Text>
-      <Text style={styles.name}>{savedName || 'Jugi Tabada'}</Text>
-      <Text style={styles.email}>sip_happens@coffee.com</Text>
-
-      <View style={styles.card}>
-        <Text style={styles.label}>Member Since</Text>
-        <Text style={styles.value}>June 2026</Text>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>👤 profile</Text>
       </View>
+      <View style={styles.body}>
+        <View style={styles.avatarContainer}>
+          <Text style={styles.avatar}>👤</Text>
+          <Text style={styles.name}>{savedName || 'Jugi Tabada'}</Text>
+          <Text style={styles.email}>jugitabada20@gmail.com</Text>
+        </View>
 
-      <View style={styles.card}>
-        <Text style={styles.label}>Total Orders</Text>
-        <Text style={styles.value}>12</Text>
-      </View>
+        <View style={styles.card}>
+          <Text style={styles.label}>MEMBER SINCE</Text>
+          <Text style={styles.value}>June 2026</Text>
+        </View>
 
-      <View style={styles.inputCard}>
-        <Text style={styles.label}>Update Your Name</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Type your name..."
-          value={name}
-          onChangeText={setName}
-        />
-        <TouchableOpacity style={styles.button} onPress={saveName}>
-          <Text style={styles.buttonText}>Save Name</Text>
-        </TouchableOpacity>
+        <View style={styles.card}>
+          <Text style={styles.label}>TOTAL ORDERS</Text>
+          <Text style={styles.value}>12</Text>
+        </View>
+
+        <View style={styles.card}>
+          <Text style={styles.label}>UPDATE YOUR NAME</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Type your name..."
+            value={name}
+            onChangeText={setName}
+          />
+          <TouchableOpacity style={styles.button} onPress={saveName}>
+            <Text style={styles.buttonText}>Save Note</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -66,44 +73,57 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
+    backgroundColor: '#FAF7F0',
+  },
+  header: {
+    backgroundColor: '#8B0000',
     paddingTop: 60,
-    backgroundColor: '#FDF6EE',
+    paddingBottom: 20,
+    alignItems: 'center',
+  },
+  headerTitle: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#fff',
+    fontStyle: 'italic',
+  },
+  body: {
+    flex: 1,
+    padding: 16,
+  },
+  avatarContainer: {
+    alignItems: 'center',
+    marginBottom: 24,
+    marginTop: 16,
   },
   avatar: {
     fontSize: 64,
-    marginBottom: 12,
+    marginBottom: 8,
   },
   name: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#3E1F00',
+    color: '#222',
   },
   email: {
     fontSize: 14,
     color: '#888',
-    marginBottom: 30,
+    marginTop: 4,
   },
   card: {
-    width: '80%',
-    backgroundColor: '#FFF8F2',
+    backgroundColor: '#fff',
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
-    borderLeftWidth: 4,
-    borderLeftColor: '#C1440E',
-  },
-  inputCard: {
-    width: '80%',
-    backgroundColor: '#FFF8F2',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    borderLeftWidth: 4,
-    borderLeftColor: '#1A4D2E',
+    borderBottomWidth: 3,
+    borderBottomColor: '#8B0000',
+    shadowColor: '#000',
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    elevation: 2,
   },
   label: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#888',
     textTransform: 'uppercase',
     letterSpacing: 1,
@@ -111,28 +131,27 @@ const styles = StyleSheet.create({
   },
   value: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#3E1F00',
-    marginTop: 4,
+    fontWeight: '700',
+    color: '#222',
   },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 8,
-    padding: 10,
+    padding: 12,
     fontSize: 14,
-    marginBottom: 10,
-    backgroundColor: '#fff',
+    marginBottom: 12,
+    backgroundColor: '#FAF7F0',
   },
   button: {
-    backgroundColor: '#3E1F00',
-    paddingVertical: 10,
+    backgroundColor: '#8B0000',
+    paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
   },
   buttonText: {
     color: '#fff',
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '600',
   },
 });

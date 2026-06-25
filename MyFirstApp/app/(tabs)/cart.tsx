@@ -41,31 +41,38 @@ function CartScreen({ navigation }: any) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>SPECIAL INSTRUCTIONS</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="e.g. Extra sugar, no ice..."
-        value={note}
-        onChangeText={setNote}
-      />
-      <TouchableOpacity style={styles.button} onPress={saveNote}>
-        <Text style={styles.buttonText}>Save Note</Text>
-      </TouchableOpacity>
-
-      {savedNote ? (
-        <View style={styles.savedBox}>
-          <Text style={styles.savedLabel}>LAST SAVED NOTE</Text>
-          <Text style={styles.savedNote}>{savedNote}</Text>
-          <Text style={styles.savedTime}>Saved at {savedTime}</Text>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>🛒 my cart</Text>
+      </View>
+      <View style={styles.body}>
+        <View style={styles.card}>
+          <Text style={styles.label}>SPECIAL INSTRUCTIONS</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="e.g. Extra sugar, no ice..."
+            value={note}
+            onChangeText={setNote}
+          />
+          <TouchableOpacity style={styles.button} onPress={saveNote}>
+            <Text style={styles.buttonText}>Save Note</Text>
+          </TouchableOpacity>
         </View>
-      ) : null}
 
-      <TouchableOpacity
-        style={styles.summaryButton}
-        onPress={() => navigation.navigate('OrderSummary')}
-      >
-        <Text style={styles.buttonText}>View Order Summary</Text>
-      </TouchableOpacity>
+        {savedNote ? (
+          <View style={styles.savedBox}>
+            <Text style={styles.savedLabel}>LAST SAVED NOTE</Text>
+            <Text style={styles.savedNote}>{savedNote}</Text>
+            <Text style={styles.savedTime}>Saved at {savedTime}</Text>
+          </View>
+        ) : null}
+
+        <TouchableOpacity
+          style={styles.summaryButton}
+          onPress={() => navigation.navigate('OrderSummary')}
+        >
+          <Text style={styles.buttonText}>View Order Summary</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -73,13 +80,18 @@ function CartScreen({ navigation }: any) {
 function OrderSummaryScreen({ navigation }: any) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>📋 Order Summary</Text>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.goBack()}
-      >
-        <Text style={styles.buttonText}>← Back to Cart</Text>
-      </TouchableOpacity>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>📋 my cart</Text>
+      </View>
+      <View style={styles.body}>
+        <Text style={styles.summaryTitle}>Order Summary</Text>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.buttonText}>← Back to Cart</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -87,15 +99,9 @@ function OrderSummaryScreen({ navigation }: any) {
 export default function App() {
   return (
     <NavigationIndependentTree>
-      <Stack.Navigator
-        screenOptions={{
-          headerStyle: { backgroundColor: '#1A4D2E' },
-          headerTintColor: '#F5F5F5',
-          headerTitleStyle: { fontWeight: 'bold' },
-        }}
-      >
-        <Stack.Screen name="Cart" component={CartScreen} options={{ title: '🛒 My Cart' }} />
-        <Stack.Screen name="OrderSummary" component={OrderSummaryScreen} options={{ title: 'Order Summary', headerLeft: () => null }} />
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Cart" component={CartScreen} />
+        <Stack.Screen name="OrderSummary" component={OrderSummaryScreen} />
       </Stack.Navigator>
     </NavigationIndependentTree>
   );
@@ -104,20 +110,47 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#FAF7F0',
   },
-  title: {
-    fontSize: 24,
+  header: {
+    backgroundColor: '#8B0000',
+    paddingTop: 60,
+    paddingBottom: 20,
+    alignItems: 'center',
+  },
+  headerTitle: {
+    fontSize: 32,
     fontWeight: 'bold',
-    marginBottom: 30,
-    textAlign: 'center',
+    color: '#fff',
+    fontStyle: 'italic',
+  },
+  body: {
+    flex: 1,
+    padding: 16,
+  },
+  summaryTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#222',
+    marginBottom: 20,
+  },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderBottomWidth: 3,
+    borderBottomColor: '#8B0000',
+    shadowColor: '#000',
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    elevation: 2,
   },
   label: {
     fontSize: 11,
     color: '#888',
     letterSpacing: 1,
-    marginBottom: 6,
+    marginBottom: 8,
     textTransform: 'uppercase',
   },
   input: {
@@ -126,18 +159,18 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     fontSize: 14,
-    marginBottom: 10,
+    marginBottom: 12,
+    backgroundColor: '#FAF7F0',
   },
   button: {
-    backgroundColor: '#1A4D2E',
-    paddingVertical: 12,
+    backgroundColor: '#8B0000',
+    paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
-    marginBottom: 16,
   },
   summaryButton: {
-    backgroundColor: '#1A4D2E',
-    paddingVertical: 12,
+    backgroundColor: '#8B0000',
+    paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 8,
@@ -148,10 +181,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   savedBox: {
-    backgroundColor: '#f5f5f5',
-    borderRadius: 8,
-    padding: 12,
+    backgroundColor: '#FFF0F0',
+    borderRadius: 12,
+    padding: 16,
     marginBottom: 16,
+    borderBottomWidth: 3,
+    borderBottomColor: '#8B0000',
   },
   savedLabel: {
     fontSize: 11,
@@ -163,7 +198,7 @@ const styles = StyleSheet.create({
   savedNote: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1A4D2E',
+    color: '#8B0000',
   },
   savedTime: {
     fontSize: 12,

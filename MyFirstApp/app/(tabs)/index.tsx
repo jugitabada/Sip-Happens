@@ -1,9 +1,10 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationIndependentTree } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-// Sip Happens Cafe - Lecture 5. June 22, 2026
+// Sip Happens Cafe - Last Lecture. June 25, 2026
 
 const Stack = createStackNavigator();
 
@@ -11,6 +12,7 @@ function HomeScreen({ navigation }: any) {
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [favorites, setFavorites] = useState<any[]>([]);
 
   useEffect(() => {
     fetch('https://api.npoint.io/41cd5c9345262362eed9')
@@ -25,10 +27,48 @@ function HomeScreen({ navigation }: any) {
       });
   }, []);
 
+  useEffect(() => {
+    const loadFavorites = async () => {
+      try {
+        const stored = await AsyncStorage.getItem('coffeeFavorites');
+        if (stored) setFavorites(JSON.parse(stored));
+      } catch (e) {
+        console.log('Failed to load', e);
+      }
+    };
+    loadFavorites();
+  }, []);
+
+  useEffect(() => {
+    const saveFavorites = async () => {
+      try {
+        await AsyncStorage.setItem('coffeeFavorites', JSON.stringify(favorites));
+      } catch (e) {
+        console.log('Failed to save', e);
+      }
+    };
+    saveFavorites();
+  }, [favorites]);
+
+  const addToFavorites = (drink: any) => {
+    const newFav = {
+      id: drink.id || Date.now(),
+      name: drink.name,
+      price: drink.price,
+    };
+    setFavorites([...favorites, newFav]);
+  };
+
+  const removeFromFavorites = (id: any) => {
+    setFavorites(favorites.filter(item => item.id !== id));
+  };
+
+  const isFavorite = (id: any) => favorites.some(item => item.id === id);
+
   if (loading) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#3E1F00" />
+        <ActivityIndicator size="large" color="#8B0000" />
         <Text style={styles.loadingText}>Loading menu...</Text>
       </View>
     );
@@ -44,25 +84,40 @@ function HomeScreen({ navigation }: any) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>☕ Sip Happens Menu</Text>
-      <FlatList
-        data={menuItems}
-        keyExtractor={(item: any) => item.id}
-        renderItem={({ item }: any) => (
-          <View style={styles.item}>
-            <Text style={styles.category}>{item.category}</Text>
-            <Text style={styles.name}>{item.name}</Text>
-            <Text style={styles.price}>{item.price}</Text>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>sip happens</Text>
+      </View>
+      <View style={styles.body}>
+        <View style={styles.menuTitleBox}>
+          <Text style={styles.menuTitle}>Sip Happens Menu</Text>
+        </View>
+        <FlatList
+          data={menuItems}
+          keyExtractor={(item: any) => item.id}
+          renderItem={({ item }: any) => (
             <TouchableOpacity
-              style={styles.viewBtn}
+              style={styles.card}
               activeOpacity={0.75}
               onPress={() => navigation.navigate('Detail', { coffee: item })}
             >
-              <Text style={styles.viewBtnText}>View Item</Text>
+              <View style={styles.cardContent}>
+                <View>
+                  <Text style={styles.cardCategory}>{item.category}</Text>
+                  <Text style={styles.cardName}>{item.name}</Text>
+                  <Text style={styles.cardPrice}>{item.price}</Text>
+                </View>
+                <TouchableOpacity
+                  onPress={() => isFavorite(item.id) ? removeFromFavorites(item.id) : addToFavorites(item)}
+                >
+                  <Text style={styles.heartIcon}>
+                    {isFavorite(item.id) ? '❤️' : '🤍'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </TouchableOpacity>
-          </View>
-        )}
-      />
+          )}
+        />
+      </View>
     </View>
   );
 }
@@ -89,15 +144,19 @@ function DetailScreen({ route, navigation }: any) {
 export default function App() {
   return (
     <NavigationIndependentTree>
-      <Stack.Navigator
-        screenOptions={{
-          headerStyle: { backgroundColor: '#3E1F00' },
-          headerTintColor: '#F5E6D3',
-          headerTitleStyle: { fontWeight: 'bold' },
-        }}
-      >
-        <Stack.Screen name="Menu" component={HomeScreen} options={{ title: '☕ Sip Happens' }} />
-        <Stack.Screen name="Detail" component={DetailScreen} options={{ title: 'Coffee Details', headerLeft: () => null }} />
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Menu" component={HomeScreen} />
+        <Stack.Screen
+          name="Detail"
+          component={DetailScreen}
+          options={{
+            headerShown: true,
+            headerStyle: { backgroundColor: '#8B0000' },
+            headerTintColor: '#fff',
+            headerTitle: 'Coffee Details',
+            headerLeft: () => null,
+          }}
+        />
       </Stack.Navigator>
     </NavigationIndependentTree>
   );
@@ -108,77 +167,91 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FDF6EE',
+    backgroundColor: '#FAF7F0',
   },
   loadingText: {
     marginTop: 12,
     fontSize: 16,
-    color: '#3E1F00',
+    color: '#8B0000',
   },
   errorText: {
     fontSize: 16,
-    color: '#C1440E',
+    color: '#8B0000',
     textAlign: 'center',
     padding: 20,
   },
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#FDF6EE',
+    backgroundColor: '#FAF7F0',
   },
-  heading: {
-    fontSize: 24,
+  header: {
+    backgroundColor: '#8B0000',
+    paddingTop: 60,
+    paddingBottom: 20,
+    alignItems: 'center',
+  },
+  headerTitle: {
+    fontSize: 32,
     fontWeight: 'bold',
-    marginBottom: 20,
-    color: '#3E1F00',
+    color: '#fff',
+    fontStyle: 'italic',
   },
-  item: {
-    backgroundColor: '#FFF8F2',
+  body: {
+    flex: 1,
+    padding: 16,
+  },
+  menuTitleBox: {
+    backgroundColor: '#F0EDE8',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+  },
+  menuTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+  },
+  card: {
+    backgroundColor: '#fff',
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
-    borderLeftWidth: 4,
-    borderLeftColor: '#C1440E',
+    borderBottomWidth: 3,
+    borderBottomColor: '#8B0000',
     shadowColor: '#000',
     shadowOpacity: 0.06,
     shadowRadius: 6,
     elevation: 2,
   },
-  category: {
-    fontSize: 12,
+  cardContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  cardCategory: {
+    fontSize: 11,
     color: '#888',
-    marginBottom: 4,
     textTransform: 'uppercase',
     letterSpacing: 1,
+    marginBottom: 4,
   },
-  name: {
+  cardName: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#3E1F00',
+    fontWeight: '700',
+    color: '#222',
   },
-  price: {
+  cardPrice: {
     fontSize: 14,
-    color: '#C1440E',
+    color: '#555',
     marginTop: 4,
   },
-  viewBtn: {
-    marginTop: 10,
-    borderWidth: 1,
-    borderColor: '#3E1F00',
-    borderRadius: 6,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    alignSelf: 'flex-start',
-  },
-  viewBtnText: {
-    fontSize: 13,
-    color: '#3E1F00',
-    fontWeight: '600',
+  heartIcon: {
+    fontSize: 28,
   },
   detailContainer: {
     flex: 1,
     padding: 28,
-    backgroundColor: '#FDF6EE',
+    backgroundColor: '#FAF7F0',
     justifyContent: 'center',
   },
   detailCategory: {
@@ -191,12 +264,12 @@ const styles = StyleSheet.create({
   detailName: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#3E1F00',
+    color: '#222',
     marginBottom: 8,
   },
   detailPrice: {
     fontSize: 22,
-    color: '#C1440E',
+    color: '#8B0000',
     fontWeight: '600',
     marginBottom: 20,
   },
@@ -207,14 +280,14 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   backButton: {
-    backgroundColor: '#3E1F00',
+    backgroundColor: '#8B0000',
     paddingVertical: 14,
     paddingHorizontal: 28,
     borderRadius: 10,
     alignItems: 'center',
   },
   backButtonText: {
-    color: '#FDF6EE',
+    color: '#fff',
     fontSize: 16,
     fontWeight: '600',
   },
